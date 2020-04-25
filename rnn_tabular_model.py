@@ -85,9 +85,10 @@ class RnnTabularModel(nn.Module):
                 x = torch.cat([x, curr_cont], 1) if self.n_emb != 0 else curr_cont #Correct
             i_proc[:, i_bptt] = x #Checked that copying works by printing embeding changes. Maybe just check how copying like this works for pytorch, a way to do this is to check the weight of embedings to see if they are updating
             
-        res,h = self.rnn(i_proc, self.h) #Correct
+        res, h = self.rnn(i_proc, self.h) #Correct
         # if self.training: self.h = h.detach() #Correct       
-
+        self.h = h.detach() #Correct 
+        
         rnn_res = self.h_o(self.bn(res)) #Correct
         
 #         print(rnn_res.requires_grad)
