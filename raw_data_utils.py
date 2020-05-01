@@ -33,6 +33,20 @@ def sort_df(df):
     s_df.reset_index(drop=True, inplace=True)
     return s_df
 
+def aggregate_prev_results(teams):
+    """ Creates new column with prev results
+    NOTE this assumes the teams are already sorted
+    """
+    for team_df in teams:
+        team_df['PREV_RES'] = team_df.RES
+        team_df.PREV_RES = team_df.PREV_RES.shift(1, fill_value = 1)
+
+        team_df['PREV_G_EQ'] = team_df.G_EQ
+        team_df.PREV_G_EQ = team_df.PREV_G_EQ.shift(1, fill_value = 0.0)
+
+        team_df['PREV_G_EQC'] = team_df.G_EQC
+        team_df.PREV_G_EQC = team_df.PREV_G_EQC.shift(1, fill_value = 0.0)
+
 
 def get_ind_teams(df):
     """ Returns array of individual sorted teams changed to a 'Team, ContraryTeam' context

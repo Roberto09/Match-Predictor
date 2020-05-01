@@ -1,6 +1,7 @@
 import math
 import matplotlib.pyplot as plt
 from fastai import *
+from model_utils import get_res
 
 """Class that helps us see how our model reacts to different learning rates"""
 class CLR():
@@ -35,15 +36,17 @@ class CLR():
         axes.set_ylim([0.8,1.5])
 
 
-def find_lr(loss_func, opt, clr, model, train_dl):
+def find_lr(loss_func, opt, clr, model, train_dl, device):
     running_loss = 0.
     avg_beta = 0.98
     model.train()
     
     for i, curr_batch in enumerate(train_dl):
-        x_cat, x_cont, res = curr_batch[0][0].to(device), curr_batch[0][1].to(device), curr_batch[1].to(device) 
+        x_cat, x_cont = curr_batch[0][0][0].type(torch.LongTensor).to(device), curr_batch[0][1][0].to(device)
+        res = get_res(x_cat, curr_batch[1][0].type(torch.LongTensor).to(device))
         output = model(x_cat, x_cont)
-        loss = loss_func(output.view(x_cat.shape[0] * x_cat.shape[1],3), res.view(-1).long())
+
+        loss = loss_func(output, res)
         
         # calculate smoothed loss
         running_loss = avg_beta * running_loss + (1-avg_beta) * loss
